@@ -173,7 +173,7 @@ What's covered (23 tests):
   no-ops on unknown ids.
 
 **CI** (`.github/workflows/ci.yml`) runs on every push/PR: lint → typecheck →
-test → build across Node 18 and 20, plus a production `npm audit` that fails on
+test → build across Node 20 and 22, plus a production `npm audit` that fails on
 critical advisories. See [SECURITY.md](./SECURITY.md) for the dependency posture.
 
 ---
