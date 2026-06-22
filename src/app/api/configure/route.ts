@@ -6,6 +6,36 @@ import { CompanyContext, emptyCandidateModel } from "@/agent/types";
 
 export const runtime = "nodejs";
 
+// Per-field cap keeps prompt size, cost, and abuse surface bounded.
+const MAX_FIELD_LEN = 4000;
+
+/**
+ * Validates and sanitizes untrusted request input into a CompanyContext.
+ * Returns null if required fields are missing or any field is the wrong type.
+ */
+function parseCompanyContext(body: unknown): CompanyContext | null {
+  if (!body || typeof body !== "object") return null;
+  const b = body as Record<string, unknown>;
+
+  const fields = [
+    "name",
+    "description",
+    "culture",
+    "hiringProfiles",
+    "tone",
+  ] as const;
+
+  const out: Record<string, string> = {};
+  for (const f of fields) {
+    const v = b[f] ?? "";
+    if (typeof v !== "string") return null;
+    out[f] = v.trim().slice(0, MAX_FIELD_LEN);
+  }
+
+  if (!out.name || !out.description) return null;
+  return out as unknown as CompanyContext;
+}
+
 export async function POST(req: NextRequest) {
   if (!process.env.GEMINI_API_KEY) {
     return NextResponse.json(
@@ -14,16 +44,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let ctx: CompanyContext;
+  let body: unknown;
   try {
-    ctx = (await req.json()) as CompanyContext;
+    body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  if (!ctx.name || !ctx.description) {
+  const ctx = parseCompanyContext(body);
+  if (!ctx) {
     return NextResponse.json(
-      { error: "Company name and description are required." },
+      {
+        error:
+          "Company name and description are required, and all fields must be strings.",
+      },
       { status: 400 }
     );
   }

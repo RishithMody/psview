@@ -145,6 +145,37 @@ GEMINI_MODEL=gemini-2.5-flash  # optional override
 
 ---
 
+## Testing & CI
+
+The agent's reasoning is covered by unit + integration tests (Vitest). The LLM
+layer is mocked, so tests assert the **orchestration logic** deterministically —
+no API key or network needed.
+
+```bash
+npm test            # run all tests
+npm run test:watch  # watch mode
+npm run typecheck   # tsc --noEmit
+npm run lint        # next lint
+```
+
+What's covered (23 tests):
+- **`converse`** — the decision (`state`/`action`/`reasoning`) is produced
+  before the message; prior candidate model is threaded in and the updated one
+  returned; tools execute and attach results; the self-critique pass revises a
+  drifting draft, leaves a clean one untouched, and falls back safely if it
+  throws; the agent can `stop` on a red-flag reply.
+- **`configure`** — identity synthesis injects real company specifics; the
+  sequence plan derives **from the identity**, not the raw context.
+- **`tools`** — `scheduleFollowUp` / `escalateToHuman` execution + batching.
+- **session store** — save/get, history ordering, model replacement, safe
+  no-ops on unknown ids.
+
+**CI** (`.github/workflows/ci.yml`) runs on every push/PR: lint → typecheck →
+test → build across Node 18 and 20, plus a production `npm audit` that fails on
+critical advisories. See [SECURITY.md](./SECURITY.md) for the dependency posture.
+
+---
+
 ## Deploying (Railway)
 
 This app holds session state in an in-memory store, so it must run as a **single

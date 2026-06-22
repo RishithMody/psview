@@ -19,17 +19,26 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let candidateReply: string;
+  let candidateReply: unknown;
   try {
     ({ candidateReply } = await req.json());
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  if (!candidateReply || !candidateReply.trim()) {
+  if (typeof candidateReply !== "string" || !candidateReply.trim()) {
     return NextResponse.json(
-      { error: "candidateReply is required." },
+      { error: "candidateReply must be a non-empty string." },
       { status: 400 }
+    );
+  }
+
+  // Cap input length: bounds prompt size, cost, and abuse surface.
+  const MAX_REPLY_LEN = 4000;
+  if (candidateReply.length > MAX_REPLY_LEN) {
+    return NextResponse.json(
+      { error: `candidateReply exceeds ${MAX_REPLY_LEN} characters.` },
+      { status: 413 }
     );
   }
 
