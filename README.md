@@ -1,5 +1,8 @@
 # PSView — Autonomous Recruiting Agent
 
+**Live demo:** https://psview-production.up.railway.app
+**Repo:** https://github.com/RishithMody/psview
+
 An AI agent that configures itself from a company's context, gives itself a
 personality, plans a candidate outreach sequence, and runs a live conversation —
 all in a preview area where **nothing sends for real**. You simulate candidate
