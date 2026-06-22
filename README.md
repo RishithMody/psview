@@ -142,17 +142,26 @@ GEMINI_MODEL=gemini-2.5-flash  # optional override
 
 ---
 
-## Deploying (Vercel)
+## Deploying (Railway)
+
+This app holds session state in an in-memory store, so it must run as a **single
+long-lived Node server** — not on a serverless/multi-instance platform where a
+follow-up request could land on a different instance with an empty store.
+Railway runs the app as one persistent, always-warm container, which also means
+no cold starts.
 
 1. Push this repo to GitHub.
-2. Import it in Vercel.
-3. Set the `GEMINI_API_KEY` environment variable.
-4. Deploy. (No build config needed — it's a standard Next.js app.)
+2. In Railway, create a project from the repo.
+3. Set the `GEMINI_API_KEY` environment variable (optionally `GEMINI_MODEL`).
+4. Deploy. Build/start are defined in `railway.json` (`npm run build` →
+   `npm run start`); the start script binds to Railway's `$PORT` automatically.
 
-> **Note on session state:** the in-memory store lives per server instance, which
-> is ideal for a single reviewer walking through the demo. For multi-instance
-> production you'd swap the store for Redis behind the existing
-> `src/store/session.ts` interface — no other code changes required.
+> **Why not Vercel here?** Vercel's serverless functions are stateless and
+> scale to many instances, which breaks the process-local session `Map`. To run
+> on Vercel you'd swap the store for Redis (e.g. Upstash) behind the existing
+> `src/store/session.ts` interface — a one-file change — and then it would work
+> on any platform. For a single-reviewer demo, a warm single instance on Railway
+> is simpler and lower-latency.
 
 ---
 
