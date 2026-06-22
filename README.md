@@ -1,5 +1,7 @@
 # PSView — Autonomous Recruiting Agent
 
+[![CI](https://github.com/RishithMody/psview/actions/workflows/ci.yml/badge.svg)](https://github.com/RishithMody/psview/actions/workflows/ci.yml)
+
 **Live demo:** https://psview-production.up.railway.app
 **Repo:** https://github.com/RishithMody/psview
 
