@@ -160,7 +160,7 @@ npm run typecheck   # tsc --noEmit
 npm run lint        # next lint
 ```
 
-What's covered (23 tests):
+What's covered (31 tests):
 - **`converse`** — the decision (`state`/`action`/`reasoning`) is produced
   before the message; prior candidate model is threaded in and the updated one
   returned; tools execute and attach results; the self-critique pass revises a
@@ -168,6 +168,9 @@ What's covered (23 tests):
   throws; the agent can `stop` on a red-flag reply.
 - **`configure`** — identity synthesis injects real company specifics; the
   sequence plan derives **from the identity**, not the raw context.
+- **`llm`** — transient failures (429/5xx/empty output) retry with backoff and
+  recover; non-transient errors (bad key) and safety blocks fail fast; clear
+  errors on unparseable JSON.
 - **`tools`** — `scheduleFollowUp` / `escalateToHuman` execution + batching.
 - **session store** — save/get, history ordering, model replacement, safe
   no-ops on unknown ids.

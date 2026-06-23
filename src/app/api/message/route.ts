@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(turn);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("[/api/message] converse failed:", err);
     return NextResponse.json(
       { error: `Agent failed to respond: ${message}` },
       { status: 500 }

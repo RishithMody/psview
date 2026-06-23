@@ -101,12 +101,21 @@ export default function Setup() {
         body: JSON.stringify(form),
       });
       if (!res.ok) {
-        const { error } = await res.json();
-        throw new Error(error || "Failed to configure agent.");
+        const { error } = await res.json().catch(() => ({}));
+        const transient = res.status >= 500;
+        throw new Error(
+          transient
+            ? "The agent had trouble reaching the model (it can be momentarily busy). Your details are saved — just press Build agent to try again."
+            : error || "Failed to configure agent."
+        );
       }
       router.push("/preview");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
+      const offline =
+        e instanceof TypeError
+          ? "Network issue reaching the server. Check your connection and try again."
+          : null;
+      setError(offline || (e instanceof Error ? e.message : "Something went wrong."));
       setLoading(false);
     }
   }

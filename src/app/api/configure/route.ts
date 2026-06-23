@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("[/api/configure] configure failed:", err);
     return NextResponse.json(
       { error: `Failed to configure agent: ${message}` },
       { status: 500 }
